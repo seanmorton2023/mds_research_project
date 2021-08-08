@@ -6,12 +6,12 @@ import numpy as np
 #nms threshold is on a scale from 0 to 1. the lower the value
 #of nms_threshold, the more that classifications get suppressed
 #nms threshold close to 1 means "don't suppress anything"
-thres = 0.35 #prev. 0.45
+thres = 0.45
 nms_threshold = 0.5
 
 #import our image
-#img = cv.imread('lena.png')
-cap = cv.VideoCapture(1)
+#img = cv.imread('test.jpeg')
+cap = cv.VideoCapture(0)
 
 #define parameters on how big the picture is
 cap.set(3, 640)
@@ -53,7 +53,7 @@ while True:
     #attempt to detect objects with a certain confidence threshold above
     #which we're sure there's an object
     classIds, confs, bbox = net.detect(img, confThreshold=thres)
-    #print(classIds, bbox)
+    print(classIds)
     
     #convert an array of arrays to a list of arrays... a distinction
     #that only really matters to opencv
@@ -78,7 +78,8 @@ while True:
     indices = cv.dnn.NMSBoxes(bbox, confs, thres,  nms_threshold = nms_threshold)
     #print(indices)
 
-
+    markers = []
+    arm_object = []
     for i in indices:
 
         #loop through indices, and find the bounding boxes and 
@@ -87,6 +88,10 @@ while True:
         box = bbox[i]
         x, y, w, h = box
         confidence = confs[i]
+        
+        center_coords = [((x+w)/2),((y+h)/2)]
+
+
 
         text_coords = (x + 10, y + 30)
         conf_coords = (x + w - 70, y + 50)
@@ -94,7 +99,14 @@ while True:
         #this extracts a certain class ID from the list of class id's,
         #then subtracts 1 because it uses indexing from 0
         classification = class_names[classIds[i][0]-1]
+        print(classification)
+        print(center_coords)
         conf_string = str(round(confidence*100, 2))
+
+        if(classification == "bird"):
+            markers.append(center_coords)
+        else:
+            arm_object = center_coords
 
         cv.rectangle(img, (x,y), (x+w, y+h), color=(0,255,0), thickness=2)
         cv.putText(img,classification, text_coords, 
@@ -102,7 +114,7 @@ while True:
         #cv.putText(img,conf_string, conf_coords, 
         #               cv.FONT_HERSHEY_PLAIN, 1.5, (0,255,0), 2)
        
-
+    
 
     #class IDs will print as numerical representations from our list,
     #but these can be converted back into alphabetical representations
@@ -126,6 +138,25 @@ while True:
     #                   cv.FONT_HERSHEY_PLAIN, 1.5, (0,255,0), 2)
     #        cv.putText(img,conf_string, conf_coords, 
     #                   cv.FONT_HERSHEY_PLAIN, 1.5, (0,255,0), 2)
+    print(markers)
+    print(arm_object)
+    top_left = []
+    top_right = []
+    bot_left = []
+    bot_right = []
+    for coord in markers:
+        if(coord[0] < 320 and coord[1] < 240):
+            top_left = coord
+        elif(coord[0] > 320 and coord[1] < 240):
+            top_right = coord
+        elif(coord[0] < 320 and coord[1] > 240):
+            bot_left = coord
+        elif(coord[0] > 320 and coord[1] > 240):
+            bot_right = coord
+  
+    #conversion = (18/(((float(top_right[0])-float(top_left[0]))**2 + (float(top_right[1])-float(top_left[1]))**2)**0.5)) 
+    #dist = (((float(top_left[0])-float(arm_object[0]))**2 + (float(top_left[1])-float(arm_object[1]))**2)**0.5) * conversion
+    #print("distance in inches: ",dist)
 
     cv.imshow("Output", img)
 
