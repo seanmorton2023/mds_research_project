@@ -2,6 +2,9 @@
 import cv2 as cv
 import numpy as np
 
+#for readability
+import time
+
 #parameters to dork with: confidence value for detection
 #nms threshold is on a scale from 0 to 1. the lower the value
 #of nms_threshold, the more that classifications get suppressed
@@ -11,7 +14,7 @@ nms_threshold = 0.5
 
 #import our image
 #img = cv.imread('test.jpeg')
-cap = cv.VideoCapture(0)
+cap = cv.VideoCapture(1)
 
 #define parameters on how big the picture is
 cap.set(3, 640)
@@ -53,7 +56,9 @@ while True:
     #attempt to detect objects with a certain confidence threshold above
     #which we're sure there's an object
     classIds, confs, bbox = net.detect(img, confThreshold=thres)
-    print(classIds)
+
+    #print("\nClass IDs visible:")
+    #print(classIds)
     
     #convert an array of arrays to a list of arrays... a distinction
     #that only really matters to opencv
@@ -68,9 +73,6 @@ while True:
     #print(type(confs[0]))
 
     
-
-
-
     #non-maximum suppression (NMS): if two boxes describe the same object,
     #remove all but the label with the max confidence level
     #works by scanning the bounding boxes and indices of the results,
@@ -89,21 +91,24 @@ while True:
         x, y, w, h = box
         confidence = confs[i]
         
-        center_coords = [((x+w)/2),((y+h)/2)]
-
-
+        center_coords = [((x + w)/2),((y + h)/2)]
 
         text_coords = (x + 10, y + 30)
         conf_coords = (x + w - 70, y + 50)
 
         #this extracts a certain class ID from the list of class id's,
         #then subtracts 1 because it uses indexing from 0
+
+
         classification = class_names[classIds[i][0]-1]
-        print(classification)
-        print(center_coords)
+
+        #print("\nClassification and center coords:")
+        #print(classification)
+        #print(center_coords)
+
         conf_string = str(round(confidence*100, 2))
 
-        if(classification == "bird"):
+        if(classification == "bird" or classification == "cat"):
             markers.append(center_coords)
         else:
             arm_object = center_coords
@@ -114,54 +119,74 @@ while True:
         #cv.putText(img,conf_string, conf_coords, 
         #               cv.FONT_HERSHEY_PLAIN, 1.5, (0,255,0), 2)
        
-    
-
-    #class IDs will print as numerical representations from our list,
-    #but these can be converted back into alphabetical representations
-
-    #loop through all the data we found from our image input simultaneously
-    #if there is no data found, skip the labeling step
-    #if (len(classIds) != 0):
-    #    zipped_data = zip(classIds.flatten(), confs.flatten(), bbox)
-    #    for classId, confidence, box in zipped_data:
-    
-    #        #index starting with 0, not 1, and retrieve a classification from our list of names
-    #        classification = class_names[classId - 1]
-    #        text_coords = (box[0] + 10, box[1] + 30)
-    #        conf_coords = (box[2] - 10, box[1] + 30)
-    #        conf_string = str(round(confidence*100,2))
-
-
-    #        #print out the class, the confidence level, and draw a box around objects
-    #        cv.rectangle(img, box, color=(0,255,0), thickness=2)
-    #        cv.putText(img,classification, text_coords, 
-    #                   cv.FONT_HERSHEY_PLAIN, 1.5, (0,255,0), 2)
-    #        cv.putText(img,conf_string, conf_coords, 
-    #                   cv.FONT_HERSHEY_PLAIN, 1.5, (0,255,0), 2)
+    print("\nMarkers and arm object:")
     print(markers)
     print(arm_object)
+
     top_left = []
     top_right = []
-    bot_left = []
-    bot_right = []
-    for coord in markers:
-        if(coord[0] < 320 and coord[1] < 240):
-            top_left = coord
-        elif(coord[0] > 320 and coord[1] < 240):
-            top_right = coord
-        elif(coord[0] < 320 and coord[1] > 240):
-            bot_left = coord
-        elif(coord[0] > 320 and coord[1] > 240):
-            bot_right = coord
-  
-    #conversion = (18/(((float(top_right[0])-float(top_left[0]))**2 + (float(top_right[1])-float(top_left[1]))**2)**0.5)) 
-    #dist = (((float(top_left[0])-float(arm_object[0]))**2 + (float(top_left[1])-float(arm_object[1]))**2)**0.5) * conversion
-    #print("distance in inches: ",dist)
+    bottom_left = []
+    bottom_right = []
+
+    #we have 4 fiducial markers. check to see which ones are in each
+    #of the 4 quadrants of our image and define those as the 4 corners
+    #of our grid
+    center_x = 160 
+    center_y = 120
+
+    for marker in markers:
+        if(marker[0] < center_x and marker[1] < center_y):
+            top_left = marker
+        elif(marker[0] > center_x and marker[1] < center_y):
+            top_right = marker
+        elif(marker[0] < center_x and marker[1] > center_y):
+            bottom_left = marker
+        elif(marker[0] > center_x and marker[1] > center_y):
+            bottom_right = marker
+
+
+    #this code will only work if the top left + right markers are in the frame
+
+    print("\nTop Left and Right:")
+    print(top_left)
+    print(top_right)
+
+
+    try:
+        x_squared_ref = (float(top_right[0]) - float(top_left[0]))**2
+        y_squared_ref = (float(top_right[1]) - float(top_left[1]))**2
+        conversion = 18/(x_squared_ref + y_squared_ref)**0.5 
+
+        #conversion = (18/(((float(top_right[0])-float(top_left[0]))**2 
+        #           + (float(top_right[1])-float(top_left[1]))**2)**0.5)) 
+    except IndexError:
+        print("Index error: conversion")
+
+    try:
+        x_squared_dist = (float(top_left[0]) - float(arm_object[0]))**2 
+        y_squared_dist = (float(top_left[1]) - float(arm_object[1]))**2
+        dist = (x_squared_dist + y_squared_dist) ** 0.5
+
+        #dist = (((float(top_left[0]) - float(arm_object[0]))**2 
+        #       + (float(top_left[1])-float(arm_object[1]))**2)**0.5) * conversion
+
+        #multiply the distance by the conversion factor, pixels to inches
+        dist *= conversion
+        print("distance in inches: ",dist)
+
+    except NameError:
+        print("Name error: conversion wasn't properly calculated")
+
+    except IndexError:
+        print("Index error: calculating dist of object")
 
     cv.imshow("Output", img)
 
     #cv.waitKey(0) for indefinite time to keep img up 
     cv.waitKey(1)
+
+    #for debug
+    time.sleep(1)
 
 
 
