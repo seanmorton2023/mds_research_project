@@ -3,6 +3,8 @@
 // Superb Tech
 // www.youtube.com/superbtech
 
+#include <Servo.h>
+
 const int StepJ1 = 2;
 const int DirJ1 = 5;
 const int StepJ2 = 3;
@@ -11,6 +13,8 @@ const int StepJ3 = 4;
 const int DirJ3 = 7;
 
 //two grippers remaining
+
+Servo gripperServo;  // create servo object to control a servo
 
 //code says that the gripper is controlled at A0, 
 //stepper 4 is at stepj4 = 12, dirj4 = 13
@@ -32,6 +36,12 @@ void setup() {
   pinMode(StepZ, OUTPUT);
   pinMode(DirZ, OUTPUT);
 
+  //set the gripper to A0 for output
+  gripperServo.attach(A0, 600, 2500);
+
+  //testing the serial monitor
+  Serial.begin(9600);
+
 }
 
 void loop() {
@@ -39,6 +49,8 @@ void loop() {
  digitalWrite(DirJ2, HIGH);
  digitalWrite(DirJ3, HIGH);
 
+  Serial.print("Serial is working\n");
+  delay(500);
 
   ///////////////////////////////////////////////////////////////////////////
   
@@ -130,6 +142,7 @@ delay(1000);
 
 //Z TESTING
 
+/*
 //set direction to clockwise
 digitalWrite(DirZ, HIGH);
 
@@ -152,12 +165,28 @@ for (int ii = 0; ii < 50; ++ii) {
 }
 delay(1000);
 
-
-
-
+ */
+ 
 //GRIPPER TESTING
+//for (int ii = 0; ii < 200; ++ii) {
+//  digitalWrite(9, HIGH);
+//  delayMicroseconds(500);
+//  digitalWrite(9, LOW);
+//  delayMicroseconds(500);
+//}
+//delay(1000);
 
 
+//gripperServo.write(400);
+//for (int ii = 0; ii < 200; ++ii) {
+//  digitalWrite(A0, HIGH);
+//  delayMicroseconds(500);
+//  digitalWrite(A0, LOW);
+//  delayMicroseconds(500);
+//}
+ 
+//gripperServo.writeMicroseconds(1500);
+//delay(1000);
 
 
 //for(int x = 0; x<200; x++) { // loop for 200 steps

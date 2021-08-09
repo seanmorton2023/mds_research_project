@@ -52,7 +52,7 @@ String data;
 void setup() {
 
   size(960, 800);
-  myPort = new Serial(this, "COM3", 115200);
+  myPort = new Serial(this, "COM3", 9600);
   
   cp5 = new ControlP5(this);
 

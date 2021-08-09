@@ -150,7 +150,7 @@ while True:
     print("\nTop Left and Right:")
     print(top_left)
     print(top_right)
-
+    
 
     try:
         x_squared_ref = (float(top_right[0]) - float(top_left[0]))**2

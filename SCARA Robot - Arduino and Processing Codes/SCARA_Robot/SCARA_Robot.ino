@@ -49,8 +49,10 @@ int gripperArray[100];
 int positionsCounter = 0;
 
 void setup() {
-  Serial.begin(115200);
-  //Serial.begin(9600);
+  //Serial.begin(115200);
+  Serial.begin(9600);
+
+  ///*
 
   pinMode(limitSwitch1, INPUT_PULLUP);
   pinMode(limitSwitch2, INPUT_PULLUP);
@@ -69,16 +71,30 @@ void setup() {
 
   gripperServo.attach(A0, 600, 2500);
   // initial servo value - open gripper
+
+  
   data[6] = 180;
   gripperServo.write(data[6]);
   delay(1000);
   data[5] = 100;
+
+  /*
   homing();
+  */
+
+  //*/
+  
 }
 
 void loop() {
 
+  //testing the debug for the serial, since I don't know if that's working
+  //Serial.print("Serial's working\n");
+  
   if (Serial.available()) {
+
+    Serial.print("Data available");
+    
     content = Serial.readString(); // Read the incomding data from Processing
     // Extract the data from the string and put into separate integer variables (data[] array)
     for (int i = 0; i < 10; i++) {
