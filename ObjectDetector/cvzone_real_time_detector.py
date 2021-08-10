@@ -3,7 +3,7 @@ import cv2 as cv
 import numpy as np
 
 #serial port for arduino
-import serial
+#import serial
 
 #for readability
 import time
@@ -16,7 +16,7 @@ thres = 0.45
 nms_threshold = 0.5
 
 #import our image
-#img = cv.imread('test.jpeg')
+#img = cv.imread('1.png')
 cap = cv.VideoCapture(1)
 
 #define parameters on how big the picture is
@@ -51,17 +51,18 @@ net.setInputMean((127.5, 127.5, 127.5))
 net.setInputSwapRB(True)
 
 #writing to arduino through python
-arduino = serial.Serial(port='COM4', baudrate=115200, timeout=.1)
+#arduino = serial.Serial(port='COM4', baudrate=115200, timeout=.1)
 
-def write_read(x):
-    arduino.write(x.encode())
-    time.sleep(0.05)
-    data = arduino.readline()
-    return data
+#def write_read(x):
+ #   arduino.write(x.encode())
+  #  time.sleep(0.05)
+   # data = arduino.readline()
+    #return data
 
-num = input("Enter an object: ") # Taking input from user
-value = write_read(num)
-print(value) # printing the value returned
+ 
+#Taking input from user
+obj = input("Enter an object: ")
+
 
 #keep taking capture images indefinitely
 while True:
@@ -126,7 +127,7 @@ while True:
 
         if(classification == "bird" or classification == "cat"):
             markers.append(center_coords)
-        else:
+        elif(classification.lower() == obj.lower()):
             arm_object = center_coords
 
         cv.rectangle(img, (x,y), (x+w, y+h), color=(0,255,0), thickness=2)
@@ -192,6 +193,8 @@ while True:
         print("x distance: ",x_dist)
         print("y distance: ",y_dist)
 
+        #value = write_read()
+        #print(value) # printing the value returned
     except NameError:
         print("Name error: conversion wasn't properly calculated")
 
@@ -201,7 +204,7 @@ while True:
     cv.imshow("Output", img)
 
     #cv.waitKey(0) for indefinite time to keep img up 
-    cv.waitKey(1)
+    cv.waitKey(0)
 
     #for debug
     time.sleep(1)
