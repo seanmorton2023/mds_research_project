@@ -174,8 +174,6 @@ while True:
         y_squared_ref = (float(top_right[1]) - float(top_left[1]))**2
         conversion = 18/(x_squared_ref + y_squared_ref)**0.5 
 
-        #conversion = (18/(((float(top_right[0])-float(top_left[0]))**2 
-        #           + (float(top_right[1])-float(top_left[1]))**2)**0.5)) 
     except IndexError:
         print("Index error: conversion")
 
@@ -184,8 +182,6 @@ while True:
         y_dist = (float(arm_object[1]) - float(top_left[1]))
         
 
-        #dist = (((float(top_left[0]) - float(arm_object[0]))**2 
-        #       + (float(top_left[1])-float(arm_object[1]))**2)**0.5) * conversion
 
         #multiply the distance by the conversion factor, pixels to inches
         x_dist *= conversion
