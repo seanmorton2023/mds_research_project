@@ -2,6 +2,9 @@
 import cv2 as cv
 import numpy as np
 
+#serial port for arduino
+import serial
+
 #for readability
 import time
 
@@ -46,6 +49,19 @@ net.setInputSize(320, 320)
 net.setInputScale(1.0/127.5)
 net.setInputMean((127.5, 127.5, 127.5))
 net.setInputSwapRB(True)
+
+#writing to arduino through python
+arduino = serial.Serial(port='COM4', baudrate=115200, timeout=.1)
+
+def write_read(x):
+    arduino.write(x.encode())
+    time.sleep(0.05)
+    data = arduino.readline()
+    return data
+
+num = input("Enter an object: ") # Taking input from user
+value = write_read(num)
+print(value) # printing the value returned
 
 #keep taking capture images indefinitely
 while True:
@@ -163,16 +179,18 @@ while True:
         print("Index error: conversion")
 
     try:
-        x_squared_dist = (float(top_left[0]) - float(arm_object[0]))**2 
-        y_squared_dist = (float(top_left[1]) - float(arm_object[1]))**2
-        dist = (x_squared_dist + y_squared_dist) ** 0.5
+        x_dist = (float(arm_object[0]) - float(top_left[0])) 
+        y_dist = (float(arm_object[1]) - float(top_left[1]))
+        
 
         #dist = (((float(top_left[0]) - float(arm_object[0]))**2 
         #       + (float(top_left[1])-float(arm_object[1]))**2)**0.5) * conversion
 
         #multiply the distance by the conversion factor, pixels to inches
-        dist *= conversion
-        print("distance in inches: ",dist)
+        x_dist *= conversion
+        y_dist *= conversion
+        print("x distance: ",x_dist)
+        print("y distance: ",y_dist)
 
     except NameError:
         print("Name error: conversion wasn't properly calculated")
