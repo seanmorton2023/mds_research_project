@@ -2,6 +2,9 @@
 import cv2 as cv
 import numpy as np
 
+#serial port for arduino
+#import serial
+
 #for readability
 import time
 
@@ -13,7 +16,7 @@ thres = 0.45
 nms_threshold = 0.5
 
 #import our image
-#img = cv.imread('test.jpeg')
+#img = cv.imread('1.png')
 cap = cv.VideoCapture(1)
 
 #second capture: we will need two cameras simultaneously
@@ -50,6 +53,20 @@ net.setInputSize(320, 320)
 net.setInputScale(1.0/127.5)
 net.setInputMean((127.5, 127.5, 127.5))
 net.setInputSwapRB(True)
+
+#writing to arduino through python
+#arduino = serial.Serial(port='COM4', baudrate=115200, timeout=.1)
+
+#def write_read(x):
+ #   arduino.write(x.encode())
+  #  time.sleep(0.05)
+   # data = arduino.readline()
+    #return data
+
+ 
+#Taking input from user
+obj = input("Enter an object: ")
+
 
 #keep taking capture images indefinitely
 while True:
@@ -116,7 +133,7 @@ while True:
 
         if(classification == "bird" or classification == "cat"):
             markers.append(center_coords)
-        else:
+        elif(classification.lower() == obj.lower()):
             arm_object = center_coords
 
         cv.rectangle(img, (x,y), (x+w, y+h), color=(0,255,0), thickness=2)
@@ -169,17 +186,19 @@ while True:
         print("Index error: conversion")
 
     try:
-        x_squared_dist = (float(top_left[0]) - float(arm_object[0]))**2 
-        y_squared_dist = (float(top_left[1]) - float(arm_object[1]))**2
-        dist = (x_squared_dist + y_squared_dist) ** 0.5
+        x_dist = (float(arm_object[0]) - float(top_left[0])) 
+        y_dist = (float(arm_object[1]) - float(top_left[1]))
+        
 
-        #dist = (((float(top_left[0]) - float(arm_object[0]))**2 
-        #       + (float(top_left[1])-float(arm_object[1]))**2)**0.5) * conversion
 
         #multiply the distance by the conversion factor, pixels to inches
-        dist *= conversion
-        print("distance in inches: ",dist)
+        x_dist *= conversion
+        y_dist *= conversion
+        print("x distance: ",x_dist)
+        print("y distance: ",y_dist)
 
+        #value = write_read()
+        #print(value) # printing the value returned
     except NameError:
         print("Name error: conversion wasn't properly calculated")
 
@@ -190,7 +209,7 @@ while True:
     cv.imshow("Camera 2", img2)
 
     #cv.waitKey(0) for indefinite time to keep img up 
-    cv.waitKey(1)
+    cv.waitKey(0)
 
     #for debug
     #time.sleep(1)
