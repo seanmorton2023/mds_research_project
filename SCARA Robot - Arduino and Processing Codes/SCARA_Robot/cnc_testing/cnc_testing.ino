@@ -56,7 +56,7 @@ void loop() {
   
   //J1 TESTING
 
-  /*
+  ///*
  
  for(int x = 0; x < 400; x++) { // loop for 200 steps
   digitalWrite(StepJ1,HIGH);
@@ -76,13 +76,13 @@ delay(1000); // delay for 1 second
   }
 delay(1000); //delay 1 second
 
-*/
+//*/
 
 ///////////////////////////////////////////////////////////////////
 
 //J2 TESTING
 
-/*
+///*
 
 //set direction to clockwise first
 digitalWrite(DirJ2, HIGH);
@@ -106,13 +106,13 @@ for (int ii = 0; ii < 200; ++ii) {
 }
 delay(1000);
 
-*/
+//*/
 
 ////////////////////////////////////////////////////////
 
 //J3 Testing
 
-/*
+///*
 
 //set direction to clockwise first
 digitalWrite(DirJ3, HIGH);
@@ -136,13 +136,13 @@ for (int ii = 0; ii < 200; ++ii) {
 }
 delay(1000);
 
-*/
+//*/
 
 //////////////////////////////////////////////////////////
 
 //Z TESTING
 
-/*
+///*
 //set direction to clockwise
 digitalWrite(DirZ, HIGH);
 
@@ -165,7 +165,7 @@ for (int ii = 0; ii < 50; ++ii) {
 }
 delay(1000);
 
- */
+//*/
  
 //GRIPPER TESTING
 //for (int ii = 0; ii < 200; ++ii) {

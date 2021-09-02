@@ -88,14 +88,8 @@ void setup() {
 
 void loop() {
 
-  //testing the debug for the serial, since I don't know if that's working
-  //Serial.print("Serial's working\n");
-  
   if (Serial.available()) {
-
-    Serial.print("Data available");
-    
-    content = Serial.readString(); // Read the incomding data from Processing
+    content = Serial.readString(); // Read the incoming data from Processing
     // Extract the data from the string and put into separate integer variables (data[] array)
     for (int i = 0; i < 10; i++) {
       int index = content.indexOf(","); // locate the first ","

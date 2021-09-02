@@ -16,6 +16,10 @@ nms_threshold = 0.5
 #img = cv.imread('test.jpeg')
 cap = cv.VideoCapture(1)
 
+#second capture: we will need two cameras simultaneously
+cap2 = cv.VideoCapture(2)
+
+
 #define parameters on how big the picture is
 cap.set(3, 640)
 cap.set(4, 480)
@@ -50,7 +54,9 @@ net.setInputSwapRB(True)
 #keep taking capture images indefinitely
 while True:
 
+    #gather data from both cameras
     success, img = cap.read()
+    _, img2 = cap2.read()
 
     #feed our image into the neural net as testing data.
     #attempt to detect objects with a certain confidence threshold above
@@ -180,13 +186,14 @@ while True:
     except IndexError:
         print("Index error: calculating dist of object")
 
-    cv.imshow("Output", img)
+    cv.imshow("Camera 1", img)
+    cv.imshow("Camera 2", img2)
 
     #cv.waitKey(0) for indefinite time to keep img up 
     cv.waitKey(1)
 
     #for debug
-    time.sleep(1)
+    #time.sleep(1)
 
 
 
