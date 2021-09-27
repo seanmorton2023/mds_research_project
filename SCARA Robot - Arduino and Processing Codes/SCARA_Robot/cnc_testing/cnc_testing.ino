@@ -56,7 +56,7 @@ void loop() {
   
   //J1 TESTING
 
-  ///*
+  /*
  
  for(int x = 0; x < 400; x++) { // loop for 200 steps
   digitalWrite(StepJ1,HIGH);
@@ -76,13 +76,13 @@ delay(1000); // delay for 1 second
   }
 delay(1000); //delay 1 second
 
-//*/
+*/
 
 ///////////////////////////////////////////////////////////////////
 
 //J2 TESTING
 
-///*
+/*
 
 //set direction to clockwise first
 digitalWrite(DirJ2, HIGH);
@@ -112,7 +112,7 @@ delay(1000);
 
 //J3 Testing
 
-///*
+/*
 
 //set direction to clockwise first
 digitalWrite(DirJ3, HIGH);

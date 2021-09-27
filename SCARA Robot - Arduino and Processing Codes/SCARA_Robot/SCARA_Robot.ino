@@ -17,7 +17,7 @@
 AccelStepper stepper1(1, 2, 5); // (Type:driver, STEP, DIR)
 AccelStepper stepper2(1, 3, 6);
 AccelStepper stepper3(1, 4, 7);
-AccelStepper stepper4(1, 12, 13);
+AccelStepper stepper4(1, 12, 13); 
 
 Servo gripperServo;  // create servo object to control a servo
 
