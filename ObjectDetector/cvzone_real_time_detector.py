@@ -243,7 +243,7 @@ if __name__ == '__main__':
 
     #collect data infinitely
     while True:
-        od.gather_camdata(ipv4_url)
+        od.gather_camdata()
         od.classify_objects()
         od.find_markers()
         od.locate_object()
