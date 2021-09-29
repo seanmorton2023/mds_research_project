@@ -20,27 +20,32 @@ import streamlit as st
 if __name__ == '__main__':
 
     #start up app
-    st.title("My first Streamlit app")
-    st.text("Enter a number:")
+    st.title("Real-Time Object Detection")
+    st.text("Hello! Here's a brief tutorial on how to turn your phone camera\n" 
+        + "into a smart computer vision camera.")
 
-    num = st.number_input("Number", step=1)
-    st.write(f'{num} + 1 = {num+1}')
+    webcam_choice = st.radio('Webcam choice',
+                             ('My phone', 'Demo Computer'))
 
-    name = st.text_input("Enter your name")
-    st.write(f'Hello {name}.')
+    if webcam_choice == 'My phone':
+        st.text('You will need to download an app called "IP Webcam" (Android)\n'
+                + 'or "ipCam" (Apple) onto your phone in order to run this demo.')
+        st.text("Find the option that says 'start server' and press the button.")
+        st.text("Enter the IP address of your webcam (ex. 12.345.67.890:8080):")
+        ip_url = st.text_input("IP address")
+        ip_url = "http://" + ip_url + "/shot.jpg"
 
-    #st.title("Webcam Live Feed")
-    #run = st.checkbox('Run')
-    #FRAME_WINDOW = st.image([])
-    #camera = cv2.VideoCapture(0)
+        st.text(f"Using variable ip_url = {ip_url}")
 
-    #while run:
-    #    _, frame = camera.read()
-    #    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-    #    FRAME_WINDOW.image(frame)
-    #else:
-    #    st.write('Stopped')
+    else:
+        st.text('You chose "Demo computer"')
+        ip_url = None
 
+    ##num = st.number_input("Number", step=1)
+    ##st.write(f'{num} + 1 = {num+1}')
+
+    ##name = st.text_input("Enter your name")
+    ##st.write(f'Hello {name}.')
 
     od = ObjectDetector()
     od.config_video()
@@ -49,7 +54,7 @@ if __name__ == '__main__':
     FRAME_WINDOW = st.image([])
 
     while True:
-        od.gather_camdata()
+        od.gather_camdata(ip_url)
  
         od.classify_objects()
         od.find_markers()
@@ -59,9 +64,3 @@ if __name__ == '__main__':
         frame_img = cv2.cvtColor(od.img, cv2.COLOR_BGR2RGB)
         FRAME_WINDOW.image(frame_img)
 
-        ####IMPORTANT###
-        #currently my color scheme is in BGR. need to convert it to RGB
-            #    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-
-    #st.write("Main function worked!")

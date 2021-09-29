@@ -4,6 +4,11 @@ import numpy as np
 import requests #for IP webcam
 import imutils
 import time
+
+#for resizing/rescaling image. we want less resolution
+#so the phone input goes faster
+from skimage.transform import rescale, resize, downscale_local_mean
+
 #import serial
 
 #some of the IP addresses of my phone cameras at diff places
@@ -75,6 +80,15 @@ class ObjectDetector:
 
             #decode, resize and show the image data
             self.img = cv2.imdecode(img_array, -1)
+
+            #testing out resizing of the image to reduce image filedata; optimize for speed
+            scale_percent = 20
+            width = int(self.img.shape[1] * scale_percent/100)
+            height = int(self.img.shape[0] * scale_percent/100)
+            dim = (width, height)
+
+            self.img = cv2.resize(self.img, dim, interpolation = cv2.INTER_AREA)
+
             self.img = imutils.resize(self.img, width=1000, height=1800)
 
         else:
@@ -243,7 +257,7 @@ if __name__ == '__main__':
 
     #collect data infinitely
     while True:
-        od.gather_camdata()
+        od.gather_camdata(ipv4_url)
         od.classify_objects()
         od.find_markers()
         od.locate_object()
