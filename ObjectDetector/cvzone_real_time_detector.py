@@ -19,9 +19,9 @@ ipv4_url = 'http://10.105.76.135:8080/shot.jpg' #northwestern
 #data and functions
 class ObjectDetector:
 
-    def __init__(self):
-        self.thres = 0.45
-        self.nms_threshold = 0.5
+    def __init__(self, thres_input, nms_input):
+        self.thres = thres_input #0.45
+        self.nms_threshold = nms_input #0.5
         #weights of mobilenet_ssd model. opencv provides us with a 
         #function that processes the weights and model by itself
         self.config_path = 'ssd_mobilenet_v3_large_coco_2020_01_14.pbtxt'
@@ -75,7 +75,11 @@ class ObjectDetector:
         '''
 
         if ip_url:
+
+            #handle the various errors that can happen when you try
+            #to get phone input: ConnectionError, InvalidURL, and more
             img_response = requests.get(ip_url)
+
             img_array = np.array(bytearray(img_response.content), dtype = np.uint8)
 
             #decode, resize and show the image data
@@ -109,7 +113,7 @@ class ObjectDetector:
         level. works by scanning the bounding boxes and indices of the results,
         and giving suggestions for what to keep
         '''
-        classIds, confs, bbox = self.net.detect(self.img, confThreshold=self.thres)
+        self.classIds, confs, bbox = self.net.detect(self.img, confThreshold=self.thres)
     
         #convert an array of arrays to a list of arrays
         bbox = list(bbox)
@@ -119,11 +123,11 @@ class ObjectDetector:
         confs = list(map(float, confs))
     
         #non-max suppression
-        indices = cv2.dnn.NMSBoxes(bbox, confs, self.thres,  nms_threshold = self.nms_threshold)
+        self.indices = cv2.dnn.NMSBoxes(bbox, confs, self.thres,  nms_threshold = self.nms_threshold)
 
         self.markers = []
         self.arm_object = []
-        for i in indices:
+        for i in self.indices:
 
             #loop through indices, and find the bounding boxes and 
             #classifications that correspond to them
@@ -139,7 +143,7 @@ class ObjectDetector:
 
             #this extracts a certain class ID from the list of class id's,
             #then subtracts 1 because it uses indexing from 0
-            classification = self.class_names[classIds[i][0]-1]
+            classification = self.class_names[self.classIds[i][0]-1]
             conf_string = str(round(confidence*100, 2))
 
             if(classification == "bird" or classification == "cat"):
@@ -212,9 +216,12 @@ class ObjectDetector:
        
             x_dist *= conversion
             y_dist *= conversion
+
+            self.coords = "(" + str(x_dist) + ", " + str(y_dist)  + ")"
+
             print("x distance: ",x_dist)
             print("y distance: ",y_dist)
-
+            print("coords: ", self.coords)
             #value = self.write_read()
             #print(value) # printing the value returned
 
@@ -250,14 +257,16 @@ class ObjectDetector:
 
 if __name__ == '__main__':
 
-    od = ObjectDetector()
+    od = ObjectDetector(0.45, 0.5)
     od.config_video()
     
     #obj = input("Enter an object: ")
 
     #collect data infinitely
     while True:
+
         od.gather_camdata(ipv4_url)
+        #od.gather_camdata()
         od.classify_objects()
         od.find_markers()
         od.locate_object()
