@@ -13,7 +13,7 @@ ControlP5 cp5; // controlP5 object
 int j1Slider = 0;
 int j2Slider = 0;
 int j3Slider = 0;
-int zSlider = 100;
+int zSlider = 0;
 int j1JogValue = 0;
 int j2JogValue = 0;
 int j3JogValue = 0;
@@ -40,7 +40,8 @@ boolean activeIK = false;
 
 int xP=365;
 int yP=0;
-int zP=100;
+//int zP=100;
+int zP = 0;
 float L1 = 228; // L1 = 228mm
 float L2 = 136.5; // L2 = 136.5mm
 float theta1, theta2, phi, z;
@@ -159,7 +160,7 @@ void setup() {
   cp5.addSlider("zSlider")
     .setPosition(110, 565)
     .setSize(270, 30)
-    .setRange(0, 150)
+    .setRange(-100, 100)
     .setColorLabel(#3269c2)
     .setFont(font)
     .setCaptionLabel("")

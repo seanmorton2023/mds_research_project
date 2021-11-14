@@ -66,17 +66,17 @@ void setup() {
   stepper2.setAcceleration(2000);
   stepper3.setMaxSpeed(4000);
   stepper3.setAcceleration(2000);
-  stepper4.setMaxSpeed(4000);
-  stepper4.setAcceleration(2000);
+  stepper4.setMaxSpeed(800); //edited this bc the Z was rising too fast
+  stepper4.setAcceleration(500);
 
   gripperServo.attach(A0, 600, 2500);
   // initial servo value - open gripper
 
   
-  data[6] = 180;
-  gripperServo.write(data[6]);
-  delay(1000);
-  data[5] = 100;
+//  data[6] = 180;
+//  gripperServo.write(data[6]);
+//  delay(1000);
+//  data[5] = 100;
 
   /*
   homing();
@@ -113,7 +113,7 @@ void loop() {
       theta2Array[positionsCounter] = data[3] * theta2AngleToSteps;
       phiArray[positionsCounter] = data[4] * phiAngleToSteps;
       zArray[positionsCounter] = data[5] * zDistanceToSteps;
-      gripperArray[positionsCounter] = data[6];
+      //gripperArray[positionsCounter] = data[6];
       positionsCounter++;
     }
     // clear data
@@ -147,18 +147,21 @@ void loop() {
       stepper2.moveTo(theta2Array[i]);
       stepper3.moveTo(phiArray[i]);
       stepper4.moveTo(zArray[i]);
-      while (stepper1.currentPosition() != theta1Array[i] || stepper2.currentPosition() != theta2Array[i] || stepper3.currentPosition() != phiArray[i] || stepper4.currentPosition() != zArray[i]) {
+      while (stepper1.currentPosition() != theta1Array[i] 
+      || stepper2.currentPosition() != theta2Array[i] 
+      || stepper3.currentPosition() != phiArray[i] 
+      || stepper4.currentPosition() != zArray[i]) {
         stepper1.run();
         stepper2.run();
         stepper3.run();
         stepper4.run();
       }
       if (i == 0) {
-        gripperServo.write(gripperArray[i]);
+        //gripperServo.write(gripperArray[i]);
       }
       else if (gripperArray[i] != gripperArray[i - 1]) {
-        gripperServo.write(gripperArray[i]);
-        delay(800); // wait 0.8s for the servo to grab or drop - the servo is slow
+        //gripperServo.write(gripperArray[i]);
+        //delay(800); // wait 0.8s for the servo to grab or drop - the servo is slow
       }
 
       //check for change in speed and acceleration or program stop
@@ -201,7 +204,7 @@ void loop() {
         stepper3.run();
         stepper4.run();
       }
-      gripperServo.write(gripperArray[i]);
+      //gripperServo.write(gripperArray[i]);
 
       if (Serial.available()) {
         content = Serial.readString(); // Read the incomding data from Processing
@@ -239,14 +242,17 @@ void loop() {
   stepper3.moveTo(stepper3Position);
   stepper4.moveTo(stepper4Position);
 
-  while (stepper1.currentPosition() != stepper1Position || stepper2.currentPosition() != stepper2Position || stepper3.currentPosition() != stepper3Position || stepper4.currentPosition() != stepper4Position) {
+  while (stepper1.currentPosition() != stepper1Position 
+  || stepper2.currentPosition() != stepper2Position 
+  || stepper3.currentPosition() != stepper3Position 
+  || stepper4.currentPosition() != stepper4Position) {
     stepper1.run();
     stepper2.run();
     stepper3.run();
     stepper4.run();
   }
   delay(100);
-  gripperServo.write(data[6]);
+  //gripperServo.write(data[6]);
   delay(300);
 }
 
@@ -264,9 +270,15 @@ void homing() {
     stepper4.setCurrentPosition(17000); // When limit switch pressed set position to 0 steps
   }
   delay(20);
-  stepper4.moveTo(10000);
-  while (stepper4.currentPosition() != 10000) {
-    stepper4.run();
+  //stepper4.moveTo(10000);
+//  while (stepper4.currentPosition() != 10000) {
+//    stepper4.run();
+//  }
+  //this didn't seem right, so here's how I would set this up
+  while (digitalRead(limitSwitch4) != 1) {
+    stepper4.setSpeed(-1100);
+    stepper4.runSpeed();
+    stepper4.setCurrentPosition(10000);
   }
 
   // Homing Stepper3

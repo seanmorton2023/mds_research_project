@@ -50,7 +50,7 @@ if __name__ == '__main__':
                 + 'or "ipCam" (Apple) onto your phone in order to run this demo.')
         st.text("Find the option that says 'start server' and press the button.")
         st.text("Enter the IP address of your webcam (ex. 12.345.67.890:8080):")
-        ip_url = st.text_input("IP address")
+        ip_url = st.text_input("Enter IP address")
         ip_url = "http://" + ip_url + "/shot.jpg"
 
         st.text(f"Using variable ip_url = {ip_url}")
