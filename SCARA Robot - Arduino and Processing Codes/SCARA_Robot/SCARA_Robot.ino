@@ -30,10 +30,17 @@ double theta1, theta2, phi, z;
 
 int stepper1Position, stepper2Position, stepper3Position, stepper4Position;
 
-const float theta1AngleToSteps = 44.444444;
-const float theta2AngleToSteps = 35.555555;
-const float phiAngleToSteps = 10;
-const float zDistanceToSteps = 100;
+//const float theta1AngleToSteps = 44.444444;
+//const float theta2AngleToSteps = 35.555555;
+//const float phiAngleToSteps = 10;
+//const float zDistanceToSteps = 100;
+
+const float theta1AngleToSteps = 9.4882;
+const float theta2AngleToSteps = 9.1722;
+const float phiAngleToSteps = 2.42;
+const float zDistanceToSteps = 27;
+
+
 
 byte inputValue[5];
 int k = 0;
@@ -60,8 +67,8 @@ void setup() {
   pinMode(limitSwitch4, INPUT_PULLUP);
 
   // Stepper motors max speed
-  stepper1.setMaxSpeed(4000);
-  stepper1.setAcceleration(2000);
+  stepper1.setMaxSpeed(2000); //tried changing this from 4000 and 2000 but didn't do anything
+  stepper1.setAcceleration(500);
   stepper2.setMaxSpeed(4000);
   stepper2.setAcceleration(2000);
   stepper3.setMaxSpeed(4000);
