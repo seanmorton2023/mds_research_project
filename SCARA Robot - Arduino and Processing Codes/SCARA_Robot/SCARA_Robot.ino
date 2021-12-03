@@ -85,15 +85,18 @@ void setup() {
 //  delay(1000);
 //  data[5] = 100;
 
-  /*
+  
   homing();
-  */
+  
 
-  //*/
+  
   
 }
 
 void loop() {
+
+  Serial.println(digitalRead(limitSwitch3));
+
 
   if (Serial.available()) {
     content = Serial.readString(); // Read the incoming data from Processing
@@ -271,58 +274,69 @@ void serialFlush() {
 
 void homing() {
   // Homing Stepper4
+  stepper4.setSpeed(450);
+
   while (digitalRead(limitSwitch4) != 1) {
-    stepper4.setSpeed(1500);
     stepper4.runSpeed();
-    stepper4.setCurrentPosition(17000); // When limit switch pressed set position to 0 steps
   }
-  delay(20);
-  //stepper4.moveTo(10000);
-//  while (stepper4.currentPosition() != 10000) {
-//    stepper4.run();
-//  }
-  //this didn't seem right, so here's how I would set this up
-  while (digitalRead(limitSwitch4) != 1) {
-    stepper4.setSpeed(-1100);
-    stepper4.runSpeed();
-    stepper4.setCurrentPosition(10000);
+  stepper4.setCurrentPosition(2400);
+  delay(2000);
+  
+  stepper4.moveTo(0);
+  while (stepper4.currentPosition() != 0){
+    stepper4.run();
   }
 
+  delay(2000);
+
+  //--------------------------//
+  
   // Homing Stepper3
+  stepper3.setSpeed(-200);
   while (digitalRead(limitSwitch3) != 1) {
-    stepper3.setSpeed(-1100);
     stepper3.runSpeed();
-    stepper3.setCurrentPosition(-1662); // When limit switch pressed set position to 0 steps
   }
-  delay(20);
+  stepper3.setCurrentPosition(-300);
+  delay(2000);
 
   stepper3.moveTo(0);
   while (stepper3.currentPosition() != 0) {
     stepper3.run();
   }
 
-  // Homing Stepper2
+  delay(2000);
+
+  //------------------------//
+
+  // Homing Steppers 1 and 2: arm has to be folded up to home Stepper 1 
+  stepper2.setSpeed(700);
   while (digitalRead(limitSwitch2) != 1) {
-    stepper2.setSpeed(-1300);
     stepper2.runSpeed();
-    stepper2.setCurrentPosition(-5420); // When limit switch pressed set position to -5440 steps
   }
-  delay(20);
+  stepper2.setCurrentPosition(1420); 
+  delay(2000);
+  
+  stepper1.setSpeed(600);
+  while (digitalRead(limitSwitch1) != 1) {
+    stepper1.runSpeed();
+  }
+  stepper1.setCurrentPosition(1950);
+  delay(2000);
+
+  //--------------------------------------//
+  
+  //Zeroing steppers 1 and 2
+  stepper1.moveTo(0);
+  while (stepper1.currentPosition() != 0) {
+    stepper1.run();
+  }
+  delay(2000);
 
   stepper2.moveTo(0);
   while (stepper2.currentPosition() != 0) {
     stepper2.run();
   }
+  delay(2000);
 
-  // Homing Stepper1
-  while (digitalRead(limitSwitch1) != 1) {
-    stepper1.setSpeed(-1200);
-    stepper1.runSpeed();
-    stepper1.setCurrentPosition(-3955); // When limit switch pressed set position to 0 steps
-  }
-  delay(20);
-  stepper1.moveTo(0);
-  while (stepper1.currentPosition() != 0) {
-    stepper1.run();
-  }
+  
 }

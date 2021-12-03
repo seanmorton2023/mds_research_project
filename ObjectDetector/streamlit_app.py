@@ -23,8 +23,8 @@ if __name__ == '__main__':
 
     #start up app
     st.title("Real-Time Object Detection")
-    st.text("Hello! Here's a brief tutorial on how to turn your phone camera\n" 
-        + "into a smart computer vision camera.")
+    #st.text("Hello! Here's a brief tutorial on how to turn your phone camera\n" 
+    #    + "into a smart computer vision camera.")
 
     webcam_choice = st.radio('Webcam choice',
                              ('My phone', 'Demo Computer'))
@@ -46,10 +46,10 @@ if __name__ == '__main__':
     #teach the user how to set up their phone so as to be able to run the
     #object detector with their phone
     if webcam_choice == 'My phone':
-        st.text('You will need to download an app called "IP Webcam" (Android)\n'
-                + 'or "ipCam" (Apple) onto your phone in order to run this demo.')
-        st.text("Find the option that says 'start server' and press the button.")
-        st.text("Enter the IP address of your webcam (ex. 12.345.67.890:8080):")
+        #st.text('You will need to download an app called "IP Webcam" (Android)\n'
+        #        + 'or "ipCam" (Apple) onto your phone in order to run this demo.')
+        #st.text("Find the option that says 'start server' and press the button.")
+        #st.text("Enter the IP address of your webcam (ex. 12.345.67.890:8080):")
         ip_url = st.text_input("Enter IP address")
         ip_url = "http://" + ip_url + "/shot.jpg"
 

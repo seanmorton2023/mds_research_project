@@ -42,8 +42,10 @@ int xP=365;
 int yP=0;
 //int zP=100;
 int zP = 0;
-float L1 = 228; // L1 = 228mm
-float L2 = 136.5; // L2 = 136.5mm
+//float L1 = 228; // L1 = 228mm
+//float L2 = 136.5; // L2 = 136.5mm
+float L1 = 8.976; //inches
+float L2 = 5.374; //inches
 float theta1, theta2, phi, z;
 
 String[] positions = new String[100];

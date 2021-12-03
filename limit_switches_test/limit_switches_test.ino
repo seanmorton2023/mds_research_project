@@ -21,7 +21,10 @@ const int StepZ = 12;
 const int DirZ = 13;
 const int Gripper = A0;
 
-int limitVal = 0;
+int limitVal1 = 0;
+int limitVal2 = 0;
+int limitVal3 = 0;
+int limitVal4 = 0;
 
 Servo gripperServo;
 
@@ -104,11 +107,21 @@ void loop() {
   // limit switch 1 is also physically disconnected - need to re-solder
 
 
-  /*
-  limitVal = digitalRead(limitSwitch4);
-  Serial.println(limitVal);
+  
+  limitVal1 = digitalRead(limitSwitch1);
+  limitVal2 = digitalRead(limitSwitch2);
+  limitVal3 = digitalRead(limitSwitch3);
+  limitVal4 = digitalRead(limitSwitch4);
+
+
+//  Serial.write("\nLimit switches 1,2,3,4:\n");
+ // Serial.println(limitVal1);
+//  Serial.println(limitVal2);
+  Serial.println(limitVal3);
+//  Serial.println(limitVal4);
+  
   //Serial.write("test");
   delay(100);
-  */
+  
 
 }
