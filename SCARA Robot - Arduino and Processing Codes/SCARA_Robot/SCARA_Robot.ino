@@ -22,10 +22,16 @@ AccelStepper stepper4(1, 12, 13);
 Servo gripperServo;  // create servo object to control a servo
 
 
-double x = 10.0;
-double y = 10.0;
-double L1 = 228; // L1 = 228mm
-double L2 = 136.5; // L2 = 136.5mm
+//double x = 10.0;
+//double y = 10.0;
+//double L1 = 228; // L1 = 228mm
+//double L2 = 136.5; // L2 = 136.5mm
+
+double x = 0.0;
+double y = 13.0;
+double L1 = 228; //inches
+double L2 = 136.5; //inches
+
 double theta1, theta2, phi, z;
 
 int stepper1Position, stepper2Position, stepper3Position, stepper4Position;
@@ -35,12 +41,11 @@ int stepper1Position, stepper2Position, stepper3Position, stepper4Position;
 //const float phiAngleToSteps = 10;
 //const float zDistanceToSteps = 100;
 
-const float theta1AngleToSteps = 9.4882;
-const float theta2AngleToSteps = 9.1722;
+//const float theta1AngleToSteps = 9.4882;
+const float theta1AngleToSteps = -11.2;
+const float theta2AngleToSteps = -9.1722;
 const float phiAngleToSteps = 2.42;
 const float zDistanceToSteps = 27;
-
-
 
 byte inputValue[5];
 int k = 0;
@@ -78,24 +83,18 @@ void setup() {
 
   gripperServo.attach(A0, 600, 2500);
   // initial servo value - open gripper
-
   
 //  data[6] = 180;
 //  gripperServo.write(data[6]);
 //  delay(1000);
 //  data[5] = 100;
-
   
-  homing();
-  
-
-  
-  
+  homing();  
 }
 
 void loop() {
 
-  Serial.println(digitalRead(limitSwitch3));
+  //Serial.println(digitalRead(limitSwitch3));
 
 
   if (Serial.available()) {
@@ -273,6 +272,7 @@ void serialFlush() {
 }
 
 void homing() {
+  
   // Homing Stepper4
   stepper4.setSpeed(450);
 
@@ -280,14 +280,14 @@ void homing() {
     stepper4.runSpeed();
   }
   stepper4.setCurrentPosition(2400);
-  delay(2000);
+  delay(1000);
   
   stepper4.moveTo(0);
   while (stepper4.currentPosition() != 0){
     stepper4.run();
   }
 
-  delay(2000);
+  delay(1000);
 
   //--------------------------//
   
@@ -297,14 +297,14 @@ void homing() {
     stepper3.runSpeed();
   }
   stepper3.setCurrentPosition(-300);
-  delay(2000);
+  delay(1000);
 
   stepper3.moveTo(0);
   while (stepper3.currentPosition() != 0) {
     stepper3.run();
   }
 
-  delay(2000);
+  delay(1000);
 
   //------------------------//
 
@@ -314,29 +314,34 @@ void homing() {
     stepper2.runSpeed();
   }
   stepper2.setCurrentPosition(1420); 
-  delay(2000);
+  delay(1000);
   
   stepper1.setSpeed(600);
   while (digitalRead(limitSwitch1) != 1) {
     stepper1.runSpeed();
   }
-  stepper1.setCurrentPosition(1950);
-  delay(2000);
+//  stepper1.setCurrentPosition(1905); //to make robot aligned with y axis
+  stepper1.setCurrentPosition(920);
+
+  delay(1000);
 
   //--------------------------------------//
   
   //Zeroing steppers 1 and 2
-  stepper1.moveTo(0);
-  while (stepper1.currentPosition() != 0) {
+//  int stepper1pos = 0;
+  int stepper1pos = -(1905-920); //to align w/ y axis
+  
+  stepper1.moveTo(stepper1pos);
+  while (stepper1.currentPosition() != stepper1pos) {
     stepper1.run();
   }
-  delay(2000);
+  delay(1000);
 
   stepper2.moveTo(0);
   while (stepper2.currentPosition() != 0) {
     stepper2.run();
   }
-  delay(2000);
+  delay(1000);
 
   
 }

@@ -38,14 +38,17 @@ int gripperValuePrevious = 100;
 
 boolean activeIK = false;
 
-int xP=365;
-int yP=0;
+//int xP=0;
+//int yP=13;
 //int zP=100;
+float xP=0;
+float yP=13;
+
 int zP = 0;
 //float L1 = 228; // L1 = 228mm
 //float L2 = 136.5; // L2 = 136.5mm
-float L1 = 8.976; //inches
-float L2 = 5.374; //inches
+float L1 = 8.98; //inches
+float L2 = 5.61; //inches
 float theta1, theta2, phi, z;
 
 String[] positions = new String[100];
@@ -67,7 +70,7 @@ void setup() {
   cp5.addSlider("j1Slider")
     .setPosition(110, 190)
     .setSize(270, 30)
-    .setRange(-180, 180) // Slider range, corresponds to Joint 1 or theta1 angle that the robot can move to
+    .setRange(-90, 270) // Slider range, corresponds to Joint 1 or theta1 angle that the robot can move to
     .setColorLabel(#3269c2)
     .setFont(font)
     .setCaptionLabel("")
@@ -162,7 +165,7 @@ void setup() {
   cp5.addSlider("zSlider")
     .setPosition(110, 565)
     .setSize(270, 30)
-    .setRange(-50, 100) //this is relative to when arm 1 is
+    .setRange(-50, 80) //this is relative to when arm 1 is
                         //approx. at the midpoint of the linear motion rods
     .setColorLabel(#3269c2)
     .setFont(font)
@@ -365,13 +368,14 @@ void draw() {
   activeIK = false; // deactivate inverseKinematics so the above if statements can be executed the next interation
 
   fill(33);
-  textSize(32);
-  text("X: ", 500, 290);
-  text(xP, 533, 290);
-  text("Y: ", 650, 290);
-  text(yP, 685, 290);
-  text("Z: ", 800, 290);
-  text(zP, 835, 290);
+  textSize(20);
+  int coordHeight = 270;
+  text("X: ", 510, coordHeight);
+  text(xP, 533, coordHeight);
+  text("Y: ", 655, coordHeight);
+  text(yP, 680, coordHeight);
+  text("Z: ", 845, coordHeight);
+  text(zP, 870, coordHeight);
   textSize(26);
   text("Gripper", 650, 420);
   text("CLOSE", 510, 470);
@@ -391,8 +395,10 @@ void draw() {
 void forwardKinematics() {
   float theta1F = theta1 * PI / 180;   // degrees to radians
   float theta2F = theta2 * PI / 180;
-  xP = round(L1 * cos(theta1F) + L2 * cos(theta1F + theta2F));
-  yP = round(L1 * sin(theta1F) + L2 * sin(theta1F + theta2F));
+  //xP = round(L1 * cos(theta1F) + L2 * cos(theta1F + theta2F));
+  //yP = round(L1 * sin(theta1F) + L2 * sin(theta1F + theta2F));
+  xP = L1 * cos(theta1F) + L2 * cos(theta1F + theta2F);
+  yP = L1 * sin(theta1F) + L2 * sin(theta1F + theta2F);
 }
 
  // INVERSE KINEMATICS
@@ -457,14 +463,18 @@ void controlEvent(ControlEvent theEvent) {
 
 public void xTextfield(String theText) {
   //If we enter a value into the Textfield, read the value, convert to integer, set the inverseKinematics mode active
-  xP=Integer.parseInt(theText);
+  //xP=Integer.parseInt(theText);
+  
+  //changed to float so we have decimal inches
+  xP=Float.parseFloat(theText);
   activeIK = true;
   inverseKinematics(xP, yP); // Use inverse kinematics to calculate the J1(theta1), J2(theta2), and J3(phi) positions
   //activeIK = false;
   println("Test; theta1: "+theta1+" theta2: "+theta2);
 }
 public void yTextfield(String theText) {
-  yP=Integer.parseInt(theText);
+  //yP=Integer.parseInt(theText);
+  yP=Float.parseFloat(theText);
   activeIK = true;
   inverseKinematics(xP, yP);
   //activeIK = false;
