@@ -13,7 +13,8 @@ from skimage.transform import rescale, resize, downscale_local_mean
 
 #some of the IP addresses of my phone cameras at diff places
 #ipv4_url = 'http://10.0.0.164:8080/shot.jpg' #sherman apt
-ipv4_url = 'http://10.105.76.135:8080/shot.jpg' #northwestern
+#ipv4_url = 'http://10.105.76.135:8080/shot.jpg' #northwestern
+ipv4_url = None
 
 #create a new class for object detector: makes member
 #data and functions
@@ -38,8 +39,8 @@ class ObjectDetector:
         file than write all 90 class names individually
         '''
 
-        self.cap = cv2.VideoCapture(0)
-        self.cap2 = cv2.VideoCapture(2)
+        self.cap = cv2.VideoCapture(1)
+        self.cap2 = cv2.VideoCapture(0)
 
         #size
         self.cap.set(3, 640)
@@ -83,25 +84,27 @@ class ObjectDetector:
             img_array = np.array(bytearray(img_response.content), dtype = np.uint8)
 
             #decode, resize and show the image data
-            self.img = cv2.imdecode(img_array, -1)
+            image = cv2.imdecode(img_array, -1)
 
             #testing out resizing of the image to reduce image filedata; optimize for speed
-            scale_percent = 20
-            width = int(self.img.shape[1] * scale_percent/100)
-            height = int(self.img.shape[0] * scale_percent/100)
+            scale_percent = 20 #best performance with an acceptable resolution
+            width = int(image.shape[1] * scale_percent/100)
+            height = int(image.shape[0] * scale_percent/100)
             dim = (width, height)
 
-            self.img = cv2.resize(self.img, dim, interpolation = cv2.INTER_AREA)
+            image = cv2.resize(image, dim, interpolation = cv2.INTER_AREA)
 
-            self.img = imutils.resize(self.img, width=1000, height=1800)
+            image = imutils.resize(image, width=1000, height=1800)
 
         else:
-            _, self.img = self.cap.read()
+            _, image = self.cap.read()
 
         #second capture, from webcam #2. may or not be active; handled later
-        _, self.img2 = self.cap2.read()
+        _, image2 = self.cap2.read()
 
-    def classify_objects(self):
+        return image, image2
+
+    def classify_objects(self, image):
         '''carry out detection and classification of objects
 
         first, feed our image into the neural net as testing data.
@@ -112,27 +115,28 @@ class ObjectDetector:
         the same object, remove all but the label with the max confidence 
         level. works by scanning the bounding boxes and indices of the results,
         and giving suggestions for what to keep
+
+        Returns: image, markers_list
         '''
-        self.classIds, confs, bbox = self.net.detect(self.img, confThreshold=self.thres)
+        classIds, confs, bboxes = self.net.detect(image, confThreshold=self.thres)
     
         #convert an array of arrays to a list of arrays
-        bbox = list(bbox)
+        bboxes = list(bboxes)
 
         #remake into a list and remove outer brackets
         confs = list(np.array(confs).reshape(1,-1)[0])
         confs = list(map(float, confs))
     
         #non-max suppression
-        self.indices = cv2.dnn.NMSBoxes(bbox, confs, self.thres,  nms_threshold = self.nms_threshold)
+        indices = cv2.dnn.NMSBoxes(bboxes, confs, self.thres,  nms_threshold = self.nms_threshold)
 
-        self.markers = []
-        self.arm_object = []
-        for i in self.indices:
+        markers_list = []
+        for i in indices:
 
             #loop through indices, and find the bounding boxes and 
             #classifications that correspond to them
             i = i[0]
-            box = bbox[i]
+            box = bboxes[i]
             x, y, w, h = box
             confidence = confs[i]
         
@@ -143,76 +147,106 @@ class ObjectDetector:
 
             #this extracts a certain class ID from the list of class id's,
             #then subtracts 1 because it uses indexing from 0
-            classification = self.class_names[self.classIds[i][0]-1]
+            classification = self.class_names[classIds[i][0]-1]
             conf_string = str(round(confidence*100, 2))
 
             if(classification == "bird" or classification == "cat"):
-                self.markers.append(center_coords)
-            else:
-                #check to see if "obj" exists:
-                try:
-                    if classification.lower() == obj.lower():
-                        self.arm_object = center_coords
-                except NameError:
-                    print("Name error: object not defined")
+                markers_list.append(center_coords)
 
-            cv2.rectangle(self.img, (x,y), (x+w, y+h), color=(0,255,0), thickness=2)
-            cv2.putText(self.img,classification, text_coords, 
+            cv2.rectangle(image, (x,y), (x+w, y+h), color=(0,255,0), thickness=2)
+            cv2.putText(image,classification, text_coords, 
                            cv2.FONT_HERSHEY_PLAIN, 1.5, (0,255,0), 2)
-            #cv.putText(self.img,conf_string, conf_coords, 
+            #cv.putText(image,conf_string, conf_coords, 
             #               cv2.FONT_HERSHEY_PLAIN, 1.5, (0,255,0), 2)
        
         print("\nMarkers and arm object:")
-        print(self.markers)
-        print(self.arm_object)
+        print(markers_list)
 
-    def find_markers(self):
+        #return an edited version of original image, markers list, and indices of 
+        #objects detected; classIds and indices
+        return image, markers_list, classIds, indices, bboxes
+
+    def find_markers(self, markers_list):
         '''find locations of our 4 fiducial markers. check to see which ones
         are in each of the 4 quadrants of our image and define those as the 
         4 corners of our grid
         '''
 
-        self.top_left = []
-        self.top_right = []
-        self.bottom_left = []
-        self.bottom_right = []
+        top_left = []
+        top_right = []
+        bottom_left = []
+        bottom_right = []
 
         #640 by 480 are the approx. dims of our camera width
         center_x = 160 #should be 320 and 240, not sure why it isn't
         center_y = 120
 
-        for marker in self.markers:
+        for marker in markers_list:
             if(marker[0] < center_x and marker[1] < center_y):
-                self.top_left = marker
+                top_left = marker
             elif(marker[0] > center_x and marker[1] < center_y):
-                self.top_right = marker
+                top_right = marker
             elif(marker[0] < center_x and marker[1] > center_y):
-                self.bottom_left = marker
+                bottom_left = marker
             elif(marker[0] > center_x and marker[1] > center_y):
-                self.bottom_right = marker
+                bottom_right = marker
 
         #this code will only work if the top left + right markers are in the frame
         print("\nTop Left and Right:")
-        print(self.top_left)
-        print(self.top_right)
+        print(top_left)
+        print(top_right)
 
-    def locate_object(self):
+        #return the four marker locations
+        return top_left, top_right, bottom_left, bottom_right
+
+    def select_object(self, classIds, indices, bboxes, obj):
+        '''Takes in a string classifier of an object, then iterates through
+        the list of detected objects to find a match. Returns the coords
+        of the object within the picture.
+        '''
+
+        #loop through indices, and find the bounding boxes and 
+        #classifications that correspond to them
+        object_coords = []
+        for i in indices:
+            i = i[0]
+
+            #this extracts a certain class ID from the list of class id's,
+            #then subtracts 1 because it uses indexing from 0
+            classification = self.class_names[classIds[i][0]-1]
+            try:
+                if classification.lower() == obj.lower():
+                    
+                    box = bboxes[i]
+                    x, y, w, h = box   
+                    object_coords = [((x + w)/2),((y + h)/2)]
+                    break
+
+            except NameError:
+                print("Name error: object not defined")
+
+        #return the coordinates of the object within the image. feed
+        #this to locate_object to turn these into real-world coords
+        return object_coords
+
+    def locate_object(self, top_left, top_right, object_coords):
         '''find distance of objects from reference markers
         multiply the distance by the conversion factor, pixels to inches
         this is where location data can be sent to the arduino as well
         '''
 
         try:
-            x_squared_ref = (float(self.top_right[0]) - float(self.top_left[0]))**2
-            y_squared_ref = (float(self.top_right[1]) - float(self.top_left[1]))**2
-            conversion = 18/(x_squared_ref + y_squared_ref)**0.5 
+            L_x = 20.5
+            x_squared_ref = (float(top_right[0]) - float(top_left[0]))**2
+            y_squared_ref = (float(top_right[1]) - float(top_left[1]))**2
+            conversion = L_x/(x_squared_ref + y_squared_ref)**0.5 
  
         except IndexError:
             print("Index error: conversion")
 
         try:
-            x_dist = (float(self.arm_object[0]) - float(self.top_left[0])) 
-            y_dist = (float(self.arm_object[1]) - float(self.top_left[1]))
+            x_dist = (float(object_coords[0]) - float(top_left[0])) 
+            y_dist = (float(object_coords[1]) - float(top_left[1]))
        
             x_dist *= conversion
             y_dist *= conversion
@@ -231,14 +265,14 @@ class ObjectDetector:
         except IndexError:
             print("Index error: calculating dist of object")
 
-    def display(self):
+    def display(self, image, image2):
         '''display images to screen.
         camera 2 may not always be connected; error is handled here
         '''
 
-        cv2.imshow("Camera 1", self.img)
+        cv2.imshow("Camera 1", image)
         try:
-            cv2.imshow("Camera 2", self.img2)
+            cv2.imshow("Camera 2", image2)
         except cv2.error:
             print("CV error: data not read from camera 2")
 
@@ -265,15 +299,19 @@ if __name__ == '__main__':
     #collect data infinitely
     while True:
 
-        od.gather_camdata(ipv4_url)
+        img, img2 = od.gather_camdata(ipv4_url)
         #od.gather_camdata()
-        od.classify_objects()
-        od.find_markers()
-        od.locate_object()
+        img, markers_list, classIds, indices, bboxes = od.classify_objects(img)
+        img2, markers2, classIds2, indices2, bboxes2 = od.classify_objects(img2)
 
-        od.display()
+        #return the coords of all 4 corner markers. this is the code 
+        #for object detection on our table grid
+        tl, tr, bl, br = od.find_markers(markers_list)
+        object = od.select_object(classIds, indices, bboxes, "apple")
+        od.locate_object(tl, tr, object)
+
+        od.display(img, img2)
         cv2.waitKey(1)
-
 
 
 

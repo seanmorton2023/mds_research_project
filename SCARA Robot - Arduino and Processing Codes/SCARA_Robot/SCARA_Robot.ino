@@ -89,7 +89,7 @@ void setup() {
 //  delay(1000);
 //  data[5] = 100;
   
-  homing();  
+  //homing();  
 }
 
 void loop() {

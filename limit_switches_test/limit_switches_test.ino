@@ -72,7 +72,7 @@ void setup() {
 
   //findings: when I used default settings for servo,
   //or (600, 2200), or (771, 2740), literally any value
-  //of the servo would 
+  //of the servo would cause the gripper to overgrip
   
 
 
@@ -90,8 +90,10 @@ void setup() {
    */
    
   //gripperServo.write(0);
-//  gripperServo.write(700);
-//  delay(5000);
+  //gripperServo.write(700);
+  
+  gripperServo.write(800);
+  delay(5000);
 }
 
 void loop() {

@@ -96,32 +96,8 @@ if __name__ == '__main__':
 
     while True:
 
-        ##if the user has entered an ip address, only then do we continue
-        ##if ip_url != "http:///shot.jpg":
-        #try:
         od.gather_camdata(ip_url)
 
-        #    #if no errors, just clear out the error text box
-        #    connection_error_shown = False
-        #    url_error_shown = False
-
-        ##except ConnectionError:
-        ##    if not connection_error_shown:
-        #    #st.error("Not connected")
-        ##        connection_error_shown = True
-
-        #except InvalidURL:
-        #    if not url_error_shown:
-        #        st.error("Waiting to connect")
-        #        url_error_shown = True
-        #    continue
-
-        #except:
-        #    #one place where this happens is the cv2.imdecode line
-        #    #after gathering IP camera input
-        #    #st.text("Error gathering data")
-        #    pass
- 
         #if we gathered data, and img is an attribute of od, proceed
         if 'img' in dir(od):
             od.classify_objects()
