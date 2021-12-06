@@ -13,11 +13,11 @@ import time
 #2. activate streamlit environment: "conda activate <shell name>",
 #   I called my shell streamlit_shell
 #2.5 to check that streamlit is installed in your shell, open python with
-##  command "py", in Python >>>import streamlit and >>>streamlit.__version__
-#   to get out of python: >>>exit() 
+##  command "py", in Python >>>import streamlit and >>>streamlit.__version__,
+#   then to get out of python: >>>exit() 
 #3. navigate to location where your streamlit script is
 #4. run streamlit app: streamlit run <script name>, my script is called
-#   streamlit_app.py
+#   streamlit_app.py for example
 
 if __name__ == '__main__':
 
@@ -96,29 +96,30 @@ if __name__ == '__main__':
 
     while True:
 
-        od.gather_camdata(ip_url)
+        img, img2 = od.gather_camdata(ip_url)
 
         #if we gathered data, and img is an attribute of od, proceed
-        if 'img' in dir(od):
-            od.classify_objects()
-            od.find_markers()
-            od.locate_object()
+        if 'img':
+            img, markers_list, classIds, indices, bboxes = od.classify_objects(img)
+            tl, tr, _, _ = od.find_markers(markers_list)
+            obj = od.select_object(classIds, indices, bboxes, "apple")
+            od.locate_object(tl, tr, obj)
 
             #this takes the place of the display() function
-            frame_img = cv2.cvtColor(od.img, cv2.COLOR_BGR2RGB)
+            frame_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             FRAME_WINDOW.image(frame_img)
 
             #if we detected corner markers or an object, write it into text boxes
             corner_markers_text.text("Location of markers in image: \n"
-                                     + str(od.markers))
+                                     + str(markers_list))
             top_markers_text.text("Location of top markers: \n" 
-                                    + str(od.top_left) + '\n' + str(od.top_right))
+                                    + str(tl) + '\n' + str(tr))
             #arm_object_text.text("Arm object: \n" + str(od.arm_object))
   
             #display all the classifications detected to the screen.
             #see ObjectDetector class for more detail on how this works
-            classifications = [od.class_names[od.classIds[i][0][0]-1] 
-                               for i in od.indices]
+            classifications = [od.class_names[classIds[i][0][0]-1] 
+                               for i in indices]
             classes_stylized = ''
             for x in classifications:
                 classes_stylized += x + ' \n'

@@ -24,16 +24,6 @@ def convert_coords(x, y):
 
     return x_new, y_new
 
-def write_read(text):
-    #writing to arduino through python
-
-    arduino = serial.Serial(port='COM3', baudrate=9600, timeout=.1)
-    arduino.write(text.encode())
-
-    time.sleep(0.05)
-    data = arduino.readline()
-    return data
-
 def forward_kinematics(theta1, theta2):
     '''Given a set of angles to rotate the robot to, finds the current position
     of the toolhead in x and y.
@@ -44,12 +34,15 @@ def forward_kinematics(theta1, theta2):
     xP = L1 * cos(theta1F) + L2 * cos(theta1F + theta2F)
     yP = L1 * sin(theta1F) + L2 * sin(theta1F + theta2F)
 
-
-    pass
+    return xP, yP
 
 def inverse_kinematics(x,y):
     '''Given a desired position in (x,y), finds the joint angles
-    theta1, theta2 needed to achieve that position
+    theta1, theta2 needed to achieve that position. Also calculates
+    an angle phi for joint 3 such that the gripper will be parallel
+    to the x axis.
+
+    Returns: theta1, theta2, phi
     '''
 
     #lengths of arms
@@ -99,12 +92,59 @@ def inverse_kinematics(x,y):
     theta2=round(theta2)
     phi=round(phi)
 
-    return theta1, theta2
+    return theta1, theta2, phi
+
+def format_commands(j1, j2, j3, z, gripper):
+    '''A function to take in data for the stepper motors and gripper
+    servo, then convert to a text format that we can use to move the
+    motors with the Arduino.
+
+    Assume the 'save program' and 'run program' buttons won't be used
+    for this application of the robot, and that speed + accel will be constant.
+
+    Format of data to be written to the Arduino:
+        data[0] - SAVE button status
+        data[1] - RUN button status
+        data[2] - Joint 1 angle
+        data[3] - Joint 2 angle
+        data[4] - Joint 3 angle
+        data[5] - Z position
+        data[6] - Gripper value
+        data[7] - Speed value
+        data[8] - Acceleration value
+
+    Returns: a text version of the list
+    '''
+
+    #format should look like "1,2,3,4,5,6,7,8,9" with no brackets/spaces
+    data_lst = [0, 0, j1, j2, j3, z, gripper, 500, 500]
+    str_data = str(data_lst).replace('[','') \
+                .replace(']','') \
+                .replace(' ','')
+
+    return str_data
+
+
+
+
+def write_read_arduino(text):
+    '''Writes data to the Arduino Serial. Can also read data from the 
+    Arduino and return it as text.
+    '''
+
+    arduino = serial.Serial(port='COM3', baudrate=9600, timeout=.1)
+    arduino.write(text.encode())
+
+    time.sleep(0.05)
+    data = arduino.readline()
+    return data
 
 
 if __name__ == '__main__':
     
     x = 6.2
     y = 11.3
-    theta1, theta2 = inverse_kinematics(x,y)
+    theta1, theta2, phi = inverse_kinematics(x,y)
     print('Theta1 and theta2 are: ', theta1, theta2)
+
+    print('8 squared is: ', sq(8))
