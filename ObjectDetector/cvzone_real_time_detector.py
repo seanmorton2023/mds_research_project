@@ -1,15 +1,11 @@
-
 import cv2
 import numpy as np
 import requests #for IP webcam
 import imutils
 import time
 
-#for resizing/rescaling image. we want less resolution
-#so the phone input goes faster
+#for resizing/rescaling image; less resolution -> faster img processing
 from skimage.transform import rescale, resize, downscale_local_mean
-
-#import serial
 
 #some of the IP addresses of my phone cameras at diff places
 #ipv4_url = 'http://10.0.0.164:8080/shot.jpg' #sherman apt
@@ -150,7 +146,8 @@ class ObjectDetector:
             classification = self.class_names[classIds[i][0]-1]
             conf_string = str(round(confidence*100, 2))
 
-            if(classification == "bird" or classification == "cat"):
+            #if(classification == "bird" or classification == "cat"):
+            if(classification == "CORNER"):
                 markers_list.append(center_coords)
 
             cv2.rectangle(image, (x,y), (x+w, y+h), color=(0,255,0), thickness=2)
@@ -159,7 +156,7 @@ class ObjectDetector:
             #cv.putText(image,conf_string, conf_coords, 
             #               cv2.FONT_HERSHEY_PLAIN, 1.5, (0,255,0), 2)
        
-        print("\nMarkers and arm object:")
+        print("\nMarkers:")
         print(markers_list)
 
         #return an edited version of original image, markers list, and indices of 
@@ -275,15 +272,6 @@ class ObjectDetector:
             cv2.imshow("Camera 2", image2)
         except cv2.error:
             print("CV error: data not read from camera 2")
-
-    def write_read(x):
-        #writing to arduino through python
-        arduino = serial.Serial(port='COM4', baudrate=115200, timeout=.1)
-        arduino.write(x.encode())
-        time.sleep(0.05)
-        data = arduino.readline()
-        return data
-
 
 #make a main function so that we can determine whether or not to run the code
 #in this file. especially useful for the streamlit app, which imports

@@ -420,7 +420,7 @@ void inverseKinematics(float x, float y) {
   if (x < 0 & y > 0) {       // 2nd quadrant
     theta1 = 90 - theta1;
   }
-  if (x < 0 & y < 0) {       // 3d quadrant
+  if (x < 0 & y < 0) {       // 3rd quadrant
     theta1 = 270 - theta1;
     phi = 270 - theta1 - theta2;
     phi = (-1) * phi;
