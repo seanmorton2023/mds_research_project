@@ -4,10 +4,14 @@ from math import acos, atan, cos, sin
 
 def sq(x): return x**2
 
-def convert_coords(x, y):
+def convert_coords(init_coords):
     '''Takes the coordinates output by the object detection
     code and converts it into coordinates for the robot to move to.
     '''
+    if len(init_coords) == 0:
+        return []
+
+    [x,y] = init_coords
 
     #extents of motion for the CV code
     lx = 20.5
@@ -19,10 +23,10 @@ def convert_coords(x, y):
     posn_robot = ly - ry
 
     #convert x
-    x_new = x - rx
-    y_new = y - posn_robot
+    x_new = round(x - rx, 2)
+    y_new = round(y - posn_robot, 2)
 
-    return x_new, y_new
+    return [x_new, y_new]
 
 def forward_kinematics(theta1, theta2):
     '''Given a set of angles to rotate the robot to, finds the current position
@@ -146,5 +150,8 @@ if __name__ == '__main__':
     y = 11.3
     theta1, theta2, phi = inverse_kinematics(x,y)
     print('Theta1 and theta2 are: ', theta1, theta2)
+
+    [xnew, ynew] = convert_coords([x,y])
+    print('\nXnew and ynew are: ', xnew, ynew)
 
     print('8 squared is: ', sq(8))

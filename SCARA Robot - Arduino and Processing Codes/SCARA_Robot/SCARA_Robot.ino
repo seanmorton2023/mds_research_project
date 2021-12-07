@@ -45,7 +45,7 @@ int stepper1Position, stepper2Position, stepper3Position, stepper4Position;
 const float theta1AngleToSteps = -11.2;
 const float theta2AngleToSteps = -9.1722;
 const float phiAngleToSteps = 2.42;
-const float zDistanceToSteps = 27;
+const float zDistanceToSteps = 540;
 
 byte inputValue[5];
 int k = 0;
@@ -89,7 +89,7 @@ void setup() {
 //  delay(1000);
 //  data[5] = 100;
   
-  //homing();  
+  homing();  
 }
 
 void loop() {

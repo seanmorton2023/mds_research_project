@@ -165,7 +165,7 @@ void setup() {
   cp5.addSlider("zSlider")
     .setPosition(110, 565)
     .setSize(270, 30)
-    .setRange(-50, 80) //this is relative to when arm 1 is
+    .setRange(-2.5, 4) //this is relative to when arm 1 is
                         //approx. at the midpoint of the linear motion rods
     .setColorLabel(#3269c2)
     .setFont(font)
@@ -186,7 +186,7 @@ void setup() {
   cp5.addNumberbox("zJogValue")
     .setPosition(220, 618)
     .setSize(50, 30)
-    .setRange(0, 60)
+    .setRange(0, 4)
     .setFont(font)
     .setMultiplier(0.1)
     .setValue(1)

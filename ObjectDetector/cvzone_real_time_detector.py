@@ -114,8 +114,10 @@ class ObjectDetector:
 
         Returns: image, markers_list
         '''
-        classIds, confs, bboxes = self.net.detect(image, confThreshold=self.thres)
-    
+        try:
+            classIds, confs, bboxes = self.net.detect(image, confThreshold=self.thres)
+        except cv2.error:
+            raise Exception("cv2 error: Cam1 may not be connected")
         #convert an array of arrays to a list of arrays
         bboxes = list(bboxes)
 
@@ -156,8 +158,8 @@ class ObjectDetector:
             #cv.putText(image,conf_string, conf_coords, 
             #               cv2.FONT_HERSHEY_PLAIN, 1.5, (0,255,0), 2)
        
-        print("\nMarkers:")
-        print(markers_list)
+        #print("\nMarkers:")
+        #print(markers_list)
 
         #return an edited version of original image, markers list, and indices of 
         #objects detected; classIds and indices
@@ -189,9 +191,9 @@ class ObjectDetector:
                 bottom_right = marker
 
         #this code will only work if the top left + right markers are in the frame
-        print("\nTop Left and Right:")
-        print(top_left)
-        print(top_right)
+        #print("\nTop Left and Right:")
+        #print(top_left)
+        #print(top_right)
 
         #return the four marker locations
         return top_left, top_right, bottom_left, bottom_right
@@ -220,7 +222,8 @@ class ObjectDetector:
                     break
 
             except NameError:
-                print("Name error: object not defined")
+                #print("Name error: object not defined")
+                pass
 
         #return the coordinates of the object within the image. feed
         #this to locate_object to turn these into real-world coords
@@ -230,7 +233,10 @@ class ObjectDetector:
         '''find distance of objects from reference markers
         multiply the distance by the conversion factor, pixels to inches
         this is where location data can be sent to the arduino as well
+
+        Returns: "coords" as a list
         '''
+        coords = []
 
         try:
             L_x = 20.5
@@ -239,28 +245,39 @@ class ObjectDetector:
             conversion = L_x/(x_squared_ref + y_squared_ref)**0.5 
  
         except IndexError:
-            print("Index error: conversion")
+            #print("Index error: conversion
+            pass
 
         try:
-            x_dist = (float(object_coords[0]) - float(top_left[0])) 
-            y_dist = (float(object_coords[1]) - float(top_left[1]))
+            x_dist = float(object_coords[0]) - float(top_left[0]) 
+            y_dist = float(object_coords[1]) - float(top_left[1])
        
-            x_dist *= conversion
+            #approximations of distance are a little off. for now, 
+            # a temporary fix is given
+            x_adjust = 0.95
+            x_dist *= (conversion * x_adjust)
             y_dist *= conversion
 
-            self.coords = "(" + str(x_dist) + ", " + str(y_dist)  + ")"
+            #self.coords = "(" + str(x_dist) + ", " + str(y_dist)  + ")"
+            coords = [round(x_dist,2), round(y_dist,2)]
 
-            print("x distance: ",x_dist)
-            print("y distance: ",y_dist)
-            print("coords: ", self.coords)
+            #print("x distance: ",x_dist)
+            #print("y distance: ",y_dist)
+            #print("coords: ", self.coords)
             #value = self.write_read()
             #print(value) # printing the value returned
 
         except NameError:
-            print("Name error: conversion wasn't properly calculated")
+            #print("Name error: conversion wasn't properly calculated")
+            pass
 
         except IndexError:
-            print("Index error: calculating dist of object")
+            #print("Index error: calculating dist of object")
+            pass
+
+        finally:
+            return coords
+
 
     def display(self, image, image2):
         '''display images to screen.
@@ -271,7 +288,8 @@ class ObjectDetector:
         try:
             cv2.imshow("Camera 2", image2)
         except cv2.error:
-            print("CV error: data not read from camera 2")
+            #print("CV error: data not read from camera 2")
+            pass
 
 #make a main function so that we can determine whether or not to run the code
 #in this file. especially useful for the streamlit app, which imports
