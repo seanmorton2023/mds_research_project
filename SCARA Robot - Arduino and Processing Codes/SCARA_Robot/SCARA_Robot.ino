@@ -89,7 +89,7 @@ void setup() {
 //  delay(1000);
 //  data[5] = 100;
   
-  homing();  
+  //homing();  
 }
 
 void loop() {
@@ -138,6 +138,12 @@ void loop() {
   }
   // If RUN button is pressed
   while (data[1] == 1) {
+
+    //reworked: if we send data to this button,
+    //execute homing
+    homing();
+
+    /*
     stepper1.setSpeed(data[7]);
     stepper2.setSpeed(data[7]);
     stepper3.setSpeed(data[7]);

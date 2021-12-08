@@ -27,6 +27,7 @@ if __name__ == '__main__':
     st.title("Robotic Object Detection")
     st.text("Using an overhead camera and side cam " \
             + "to detect what's in front of the bot")
+    home = st.checkbox("Homing sequence")
 
     #create sliders, text boxes for manipulating params and viewing data
     #the slider produces an output value we can use as a variable
@@ -62,6 +63,10 @@ if __name__ == '__main__':
 
     #object selected
     obj_type = "apple"
+
+    #sort of like a frame tracker for the amount of time 
+    #we have had the "run command" button up
+    n_iters = 0
 
     while True:
 
@@ -121,7 +126,38 @@ if __name__ == '__main__':
                 #
                 #I want to try using a checkbox too, so that we can turn 
                 #off the button without restarting the app 
-                print("Got to this control statement")
+                #print("Got to this control statement")
+
+                if not robot_coords:
+                    n_iters = 0 #rset the count
+                    continue
+
+                [x,y] = robot_coords
+                j1, j2, j3 = pyd.inverse_kinematics(x,y)
+                arduino_text = pyd.format_commands(j1,j2,j3,0,90)
+
+                arduino_data_txt.text("Text to send to Arduino: \n" \
+                    + arduino_text)
+
+                #send the joint angles to the arduino only once
+                if n_iters == 0:
+                   pyd.write_read_arduino(arduino_text)
+
+                n_iters += 1
+
+            elif home:
+                #send data to the arduino so it causes homing 
+                #function to activate
+                arduino_text = "0,1,0,0,0,0,0,500,500"
+                arduino_data_txt.text("Text to send to Arduino: \n" \
+                        + arduino_text)
+
+                pyd.write_read_arduino(arduino_text)
+
+            else:
+                n_iters = 0
+
+
 
             #    if not robot_coords:
             #        continue
