@@ -36,7 +36,7 @@ class ObjectDetector:
         '''
 
         self.cap = cv2.VideoCapture(1)
-        self.cap2 = cv2.VideoCapture(0)
+        self.cap2 = cv2.VideoCapture(2)
 
         #size
         self.cap.set(3, 640)

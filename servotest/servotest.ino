@@ -11,6 +11,18 @@ void setup() {
 //  gripperServo.write(0);
 //  gripperServo.write(700); 
 //  gripperServo.write(800);
+
+    myservo.write(45); //grab
+    delay(3000);
+//    myservo.write(90);
+//    delay(1000);
+//
+//    myservo.write(135);
+//    delay(1000);
+//    myservo.write(90);
+//    delay(1000);
+//    
+
  
 }
 
@@ -28,6 +40,15 @@ void loop() {
 //  delay(1000);
 //  myservo.write(90);
 //  delay(3000);
+
+//    myservo.write(45); //grab
+//    delay(3000);
+//
+//    myservo.write(135);
+//    delay(1000);
+//      myservo.write(90);
+//    delay(1000);
+//    
 
 //    myservo.write(70);
 //    myservo.write(45); //grab

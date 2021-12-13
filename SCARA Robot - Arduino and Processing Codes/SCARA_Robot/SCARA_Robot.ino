@@ -78,8 +78,8 @@ void setup() {
   stepper2.setAcceleration(2000);
   stepper3.setMaxSpeed(4000);
   stepper3.setAcceleration(2000);
-  stepper4.setMaxSpeed(800); //edited this bc the Z was rising too fast
-  stepper4.setAcceleration(500);
+  stepper4.setMaxSpeed(500); //edited this bc the Z was rising too fast
+  stepper4.setAcceleration(300);
 
   gripperServo.attach(A0, 600, 2500);
   // initial servo value - open gripper

@@ -105,7 +105,7 @@ if __name__ == '__main__':
                                     + str(tl) + '\n' + str(tr))
 
             #displaying the most important data
-            classifications_text.text("Objects detected: \n" + classes_stylized)
+            classifications_text.text("Objects detected (top view): \n" + classes_stylized)
             arm_object_text.text("Selected object: \n" + obj_type)
             cv_coords_text.text("Grid coords of object: \n" + str(cv_coords))
             robot_coords_text.text("Robot's coords of object: \n" + str(robot_coords))
