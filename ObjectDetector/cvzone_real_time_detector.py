@@ -35,8 +35,8 @@ class ObjectDetector:
         file than write all 90 class names individually
         '''
 
-        self.cap = cv2.VideoCapture(1)
-        self.cap2 = cv2.VideoCapture(2)
+        self.cap = cv2.VideoCapture(0)
+        #self.cap2 = cv2.VideoCapture(2)
 
         #size
         self.cap.set(3, 640)
@@ -96,9 +96,11 @@ class ObjectDetector:
             _, image = self.cap.read()
 
         #second capture, from webcam #2. may or not be active; handled later
-        _, image2 = self.cap2.read()
+        #_, image2 = self.cap2.read()
+  
 
-        return image, image2
+        #return image, image2
+        return image, None
 
     def classify_objects(self, image):
         '''carry out detection and classification of objects
@@ -133,7 +135,11 @@ class ObjectDetector:
 
             #loop through indices, and find the bounding boxes and 
             #classifications that correspond to them
-            i = i[0]
+            #print(f"I: {i}")
+            try:
+                i = i[0]
+            except:
+                pass
             box = bboxes[i]
             x, y, w, h = box
             confidence = confs[i]
@@ -306,9 +312,12 @@ if __name__ == '__main__':
     while True:
 
         img, img2 = od.gather_camdata(ipv4_url)
+        #img, _ = od.gather_camdata(ipv4_url)
+
+
         #od.gather_camdata()
         img, markers_list, classIds, indices, bboxes = od.classify_objects(img)
-        img2, markers2, classIds2, indices2, bboxes2 = od.classify_objects(img2)
+        #img2, markers2, classIds2, indices2, bboxes2 = od.classify_objects(img2)
 
         #return the coords of all 4 corner markers. this is the code 
         #for object detection on our table grid
@@ -316,7 +325,9 @@ if __name__ == '__main__':
         object = od.select_object(classIds, indices, bboxes, "apple")
         od.locate_object(tl, tr, object)
 
-        od.display(img, img2)
+        #od.display(img, img2)
+        od.display(img)
+
         cv2.waitKey(1)
 
 

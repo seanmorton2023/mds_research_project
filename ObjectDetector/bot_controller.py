@@ -41,6 +41,8 @@ if __name__ == '__main__':
 
     #testing this out
     ip_url = None #not using the phone webcam
+    #ip_url = "http://10.0.0.164:8080/shot.jpg"
+
     od = ObjectDetector(threshold_value, nms_value)
     od.config_video()
 
@@ -71,13 +73,15 @@ if __name__ == '__main__':
     while True:
 
         img, img2 = od.gather_camdata(ip_url)
+        #img, _ = od.gather_camdata(ip_url)
+
 
         #if we gathered data, proceed
         if 'img':
 
             #option to classify object in both views of the cam
             img, markers_list, classIds, indices, bboxes = od.classify_objects(img)
-            img2, _, _, _, _ = od.classify_objects(img2)
+            #img2, _, _, _, _ = od.classify_objects(img2)
 
             #find corner markers; coordinates of object in diff. ref frames
             tl, tr, _, _ = od.find_markers(markers_list)
@@ -87,9 +91,9 @@ if __name__ == '__main__':
 
             #this takes the place of the display() function
             frame1 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            frame2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
+            #frame2 = cv2.cvtColor(img2, cv2.COLOR_BGR2RGB)
             WINDOW1.image(frame1)
-            WINDOW2.image(frame2)
+            #WINDOW2.image(frame2)
   
             #display all the classifications detected to the screen.
             #see ObjectDetector class for more detail on how this works
